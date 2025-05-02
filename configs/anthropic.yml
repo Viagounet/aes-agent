@@ -1,0 +1,9 @@
+agent:
+  llm:
+    type: anthropic
+    model: claude-3-5-sonnet-20241022
+  output_mode: native
+environment:
+  type: BrowsingEnvironment
+  args:
+    max_turns: 5

@@ -1,0 +1,26 @@
+[project]
+name = "aes-agent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Viagounet", email = "ismael.rousseau@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.50.0",
+    "loguru>=0.7.3",
+    "mcp[cli]>=1.6.0",
+    "openai>=1.76.0",
+    "pyyaml>=6.0.2",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic"]
+
+[project.scripts]
+aes-agent = "aes_agent:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
