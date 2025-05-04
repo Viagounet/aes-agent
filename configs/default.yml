@@ -3,6 +3,11 @@ agent:
     type: openai
     model: gpt-4.1-mini
   output_mode: custom-parser
+  output_mode_kwargs:
+    history:
+      include_turn_number: true
+      include_reasoning: false
+
 environment:
   type: BrowsingEnvironment
   args:

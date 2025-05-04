@@ -19,8 +19,7 @@ class OpenAILLM(ABC):
         self._client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         self.model = model
 
-    def query(self, system_prompt: str, user_prompt: str) -> str:
-        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
+    def query(self, messages) -> str:
         logger.info(f"Sent the following to {self.__class__.__name__}: {str(messages)}")
         response = self._client.responses.create(
             model=self.model, input=messages
@@ -34,8 +33,7 @@ class AnthropicLLM(ABC):
         self._client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         self.model = model
 
-    def query(self, system_prompt: str, user_prompt: str) -> str:
-        messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": user_prompt}]
+    def query(self, messages) -> str:
         response = self._client.responses.create(
             model=self.model, input=messages
         )

@@ -1,5 +1,6 @@
 # basic import
 from mcp.server.fastmcp import FastMCP
+from typing import Any
 import math
 
 # instantiate an MCP server client
@@ -99,9 +100,9 @@ def tan(a: int) -> float:
     return float(math.tan(a))
 
 @mcp.tool()
-def final_answer(answer: str) -> str:
+def final_answer(answer: Any) -> str:
     """provides the user with your final answer, ends the conversation."""
-    return answer
+    return str(answer)
 
 # Add a dynamic greeting resource
 @mcp.resource("greeting://{name}")

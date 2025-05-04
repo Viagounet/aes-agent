@@ -7,7 +7,7 @@ from typing import TypedDict, Any
 class ToolCallingResults(TypedDict):
     reasoning: str
     tool_called_name: str
-    tool_called_arguments: list
+    tool_called_arguments: dict
     tool_called_result: Any
 
 def parse_function_call(call_string):

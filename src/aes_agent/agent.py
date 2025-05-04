@@ -4,6 +4,7 @@ from aes_agent.llm import LLM
 from aes_agent.environment import Environment
 from aes_agent.mcp.client import MCPClient
 from aes_agent.logic.custom_parser import custom_parser
+from aes_agent.utils import ToolCallingResults
 
 from loguru import logger
 
@@ -28,7 +29,7 @@ class Agent:
         self.llm = llm
         self._mcp_client = MCPClient()
         self.mode = mode
-
+        self.history: list[ToolCallingResults] = []
     @property
     def _tool_formating_function(self):
         if self.mode not in TOOL_FORMATING_MAPPING:
@@ -56,7 +57,7 @@ class Agent:
 
             match self.mode:
                 case "custom-parser":
-                    result = await custom_parser(self._mcp_client.session, self.llm, available_tools, task)
+                    result = await custom_parser(self._mcp_client.session, self.llm, available_tools, task, self.history)
                     print(result)
                     input("=====")
                 case "native":
@@ -125,6 +126,7 @@ class Agent:
 
                 case _:
                     raise Exception(f"{self.mode} is not a correct mode.")
+            self.history.append(result)
         logger.info(f"Exiting {environment}")
         await self._mcp_client.cleanup()
 
