@@ -1,7 +1,7 @@
 import ast
 import sys
 
-from typing import TypedDict, Any
+from typing import TypedDict, Any, Optional
 
 
 class ToolCallingResults(TypedDict):
@@ -9,6 +9,7 @@ class ToolCallingResults(TypedDict):
     tool_called_name: str
     tool_called_arguments: dict
     tool_called_result: Any
+    metadata: Optional[dict]
 
 
 def parse_function_call(call_string):

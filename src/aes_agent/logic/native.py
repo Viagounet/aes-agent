@@ -16,24 +16,48 @@ async def native(
     if isinstance(llm, OpenAILLM):
         pass  # To implement
     elif isinstance(llm, AnthropicLLM):
+        for tool_result in history:
+            assistant_message_content = []
+            if tool_result["metadata"]:
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": [tool_result["metadata"]["assistant_content"], tool_result["metadata"]["tool_content"]],
+                    }
+                )
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "tool_result",
+                                "tool_use_id": tool_result["metadata"]["tool_use_id"],
+                                "content": tool_result['tool_called_result'],
+                            }
+                        ],
+                    }
+                )
         response = llm.query(messages, available_tools=available_tools)
         logger.info(f"Response length: {len(response.content)}")
         reasoning = "<no reasoning>"
         for content in response.content:
             if content.type == "text":
                 reasoning = content.text
+                assistant_content = content
             if content.type == "tool_use":
                 logger.info(
                     f"Content type is tool_use: {content.name} / {content.input}"
                 )
                 tool_name = content.name
                 tool_args = content.input
-                result = await session.call_tool(tool_name, tool_args)
+                tool_content = content
+                toolcall_result = await session.call_tool(tool_name, tool_args)
                 return {
-                    "reasoning": reasoning,
+                    "reasoning": assistant_content.text,
                     "tool_called_name": tool_name,
                     "tool_called_arguments": tool_args,
-                    "tool_called_result": result,
+                    "tool_called_result": toolcall_result.content[0].text,
+                    "metadata": {"tool_use_id": content.id, "assistant_content": assistant_content, "tool_content": tool_content},
                 }
     else:
         raise Exception(f"No 'native' tool calling for LLM of type {llm}")
