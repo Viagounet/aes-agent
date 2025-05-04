@@ -42,7 +42,7 @@ async def custom_parser(
             tool_result_string = f"<Tool execution (turn {i + 1})>{tool_result['tool_called_name']}({format_args(tool_result['tool_called_arguments'])}) = {tool_result['tool_called_result']}</Tool execution (turn {i + 1})>"
             messages.append({"role": "assistant", "content": tool_result_string})
 
-    answer = llm.query(messages)
+    answer = llm.get_text(llm.query(messages))
     reasoning = answer.split("Action:")[0].replace("Reasoning: ", "").strip()
     action = answer.split("Action: ")[1].strip()
     parsed_function = parse_function_call(action)
