@@ -17,7 +17,6 @@ async def native(
         pass  # To implement
     elif isinstance(llm, AnthropicLLM):
         for tool_result in history:
-            assistant_message_content = []
             if tool_result["metadata"]:
                 messages.append(
                     {
