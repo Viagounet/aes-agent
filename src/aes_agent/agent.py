@@ -58,8 +58,6 @@ class Agent:
             match self.mode:
                 case "custom-parser":
                     result = await custom_parser(self._mcp_client.session, self.llm, available_tools, task, self.history)
-                    print(result)
-                    input("=====")
                 case "native":
                     system_prompt = "Your role is to complete the user's task by using tools that are provided to you. You will make sur e to explain your reasoning before using a particular tool."
                     user_prompt = task
@@ -126,7 +124,14 @@ class Agent:
 
                 case _:
                     raise Exception(f"{self.mode} is not a correct mode.")
+            
             self.history.append(result)
+            if result['tool_called_name'] == "final_answer":
+                logger.success(f"Final answer: {result['tool_called_result']}")
+                logger.info(f"Exiting {environment}")
+                await self._mcp_client.cleanup()
+                return self.history
+
         logger.info(f"Exiting {environment}")
         await self._mcp_client.cleanup()
 

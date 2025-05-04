@@ -8,8 +8,11 @@ def tool_to_docllm_format(tool: dict) -> str:
     args_strings: list[str] = []
     for arg_name, arg_properties in tool["input_schema"]["properties"].items():
         arg_type = "Unknown"
-        if arg_properties["type"] in TYPES_MAPPING:
-            arg_type = TYPES_MAPPING[arg_properties["type"]]
+        if "type" not in arg_properties:
+            arg_type = "Any"
+        else:
+            if arg_properties["type"] in TYPES_MAPPING:
+                arg_type = TYPES_MAPPING[arg_properties["type"]]
         args_strings.append(f"{arg_name}: {arg_type}")
     return f"{tool['name']}({', '.join(args_strings)}) => {tool['description']}"
 
