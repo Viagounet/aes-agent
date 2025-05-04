@@ -1,6 +1,15 @@
 import ast
 import sys
 
+from typing import TypedDict, Any
+
+
+class ToolCallingResults(TypedDict):
+    reasoning: str
+    tool_called_name: str
+    tool_called_arguments: list
+    tool_called_result: Any
+
 def parse_function_call(call_string):
     """
     Parses a string representation of a Python function call.

@@ -3,7 +3,8 @@ import asyncio
 from aes_agent.llm import LLM
 from aes_agent.environment import Environment
 from aes_agent.mcp.client import MCPClient
-from aes_agent.utils import parse_function_call
+from aes_agent.logic.custom_parser import custom_parser
+
 from loguru import logger
 
 
@@ -55,51 +56,9 @@ class Agent:
 
             match self.mode:
                 case "custom-parser":
-                    tools_strings: list[str] = []
-                    for tool in available_tools:
-                        tools_strings.append(self._tool_formating_function(tool))
-                    system_prompt = f"<tools>{'\n'.join(tools_strings)}</tools>\n<answer template>\nReasoning: {{your_reasoning (string)}}\nAction: func(arg1=value1, ...)</answer template>\nUsing the tools at your disposal, complete the user's request by answering following exactly the template."
-                    user_prompt = task
-                    answer = self.llm.query(
-                        system_prompt=system_prompt, user_prompt=user_prompt
-                    )
-                    reasoning = (
-                        answer.split("Action:")[0].replace("Reasoning: ", "").strip()
-                    )
-                    action = answer.split("Action: ")[1].strip()
-                    parsed_function = parse_function_call(action)
-                    if not parsed_function:
-                        logger.debug(f"Couldn't parse action: {action}")
-                        continue
-                    function_name = ""
-                    arguments = {}
-                    for available_tool in available_tools:
-                        if (
-                            "_" + available_tool["name"]
-                            == parsed_function["function_name"]
-                        ):
-                            function_name = available_tool["name"]
-                            argument_names = list(
-                                available_tool["input_schema"]["properties"].keys()
-                            )
-                            for argument_name, positional_argument_value in zip(
-                                argument_names, parsed_function["positional_args"]
-                            ):
-                                arguments[argument_name] = positional_argument_value
-                            for argument_name, argument_value in parsed_function[
-                                "keyword_args"
-                            ].items():
-                                arguments[argument_name] = argument_value
-                    logger.info(
-                        f"Calling the function '{function_name}' with the following arguments: {arguments}"
-                    )
-                    result = await self._mcp_client.session.call_tool(
-                        function_name, arguments
-                    )
-                    logger.info(
-                        f"Results of '{function_name}': {result.content[0].text}"
-                    )
-
+                    result = await custom_parser(self._mcp_client.session, self.llm, available_tools, task)
+                    print(result)
+                    input("=====")
                 case "native":
                     system_prompt = "Your role is to complete the user's task by using tools that are provided to you. You will make sur e to explain your reasoning before using a particular tool."
                     user_prompt = task
