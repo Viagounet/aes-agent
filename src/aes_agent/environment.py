@@ -21,6 +21,7 @@ class BrowsingEnvironment(Environment):
         self.max_turns = 5
         if "max_turns" in kwargs:
             self.max_turns = kwargs["max_turns"]
+        self._mcp_server_script = str(importlib.resources.files("aes_agent").joinpath("mcp/servers/local_search.py"))
 
     @property
     def is_running(self) -> bool:

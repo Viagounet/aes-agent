@@ -13,7 +13,7 @@ parser = ArgumentParser()
 parser.add_argument("--config", type=str, required=True)
 args = parser.parse_args()
 
-log_filename = "my_app_log_{time:YYYY-MM-DD}.log"
+log_filename = "logs/my_app_log_{time:YYYY-MM-DD-hh-mm-ss}.log"
 logger.add(
     log_filename,
     level="INFO",  # Log messages of level INFO and above (WARNING, ERROR, CRITICAL)
@@ -46,4 +46,4 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
 
 
 env, agent = load_from_cgf(args.config)
-agent.run(env, "Devide 10 by 5")
+agent.run(env, "How many words does the document example_resources/2408.03314v1.pdf contain? And what does page 1 say?")

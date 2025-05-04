@@ -17,6 +17,8 @@ async def native(
         pass  # To implement
     elif isinstance(llm, AnthropicLLM):
         for tool_result in history:
+            if "metadata" not in tool_result:
+                raise Exception("No tool was called")
             if tool_result["metadata"]:
                 messages.append(
                     {
@@ -51,6 +53,7 @@ async def native(
                 tool_args = content.input
                 tool_content = content
                 toolcall_result = await session.call_tool(tool_name, tool_args)
+                logger.info(f"Called tool {tool_name} with the following arguments: {tool_args} --> result is {toolcall_result}")
                 return {
                     "reasoning": assistant_content.text,
                     "tool_called_name": tool_name,
