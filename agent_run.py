@@ -17,13 +17,14 @@ log_filename = "my_app_log_{time:YYYY-MM-DD}.log"
 logger.add(
     log_filename,
     level="INFO",  # Log messages of level INFO and above (WARNING, ERROR, CRITICAL)
-    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}" # Example format
+    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",  # Example format
 )
 
+
 def load_from_cgf(path: str) -> tuple[Environment, Agent]:
-    with open(path, 'r') as file:
+    with open(path, "r") as file:
         config = yaml.safe_load(file)
-    
+
     model_name = config["agent"]["llm"]["model"]
     match config["agent"]["llm"]["type"]:
         case "openai":
@@ -31,15 +32,18 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
         case "anthropic":
             llm = AnthropicLLM(model=model_name)
         case _:
-            raise Exception(f'{config["agent"]["llm"]["type"]} is not a supported LLM.')
-    
+            raise Exception(f"{config['agent']['llm']['type']} is not a supported LLM.")
+
     match config["environment"]["type"]:
         case "BrowsingEnvironment":
             env = BrowsingEnvironment(**config["environment"]["args"])
         case _:
-            raise Exception(f"{config["environment"]["type"]} is not a supported environment.")
+            raise Exception(
+                f"{config['environment']['type']} is not a supported environment."
+            )
     agent = Agent(llm=llm, mode=config["agent"]["output_mode"])
     return env, agent
+
 
 env, agent = load_from_cgf(args.config)
 agent.run(env, "Devide 10 by 5")

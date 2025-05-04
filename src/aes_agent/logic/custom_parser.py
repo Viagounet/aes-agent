@@ -16,11 +16,13 @@ def tool_to_docllm_format(tool: dict) -> str:
         args_strings.append(f"{arg_name}: {arg_type}")
     return f"{tool['name']}({', '.join(args_strings)}) => {tool['description']}"
 
+
 def format_args(args: list[dict]):
     arguments_list_formated = []
     for argument_name, value in args.items():
         arguments_list_formated.append(f"{argument_name}={value}")
     return ", ".join(arguments_list_formated)
+
 
 async def custom_parser(
     session, llm, available_tools, task, history: list[ToolCallingResults]

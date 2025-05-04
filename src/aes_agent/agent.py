@@ -31,6 +31,7 @@ class Agent:
         self._mcp_client = MCPClient()
         self.mode = mode
         self.history: list[ToolCallingResults] = []
+
     @property
     def _tool_formating_function(self):
         if self.mode not in TOOL_FORMATING_MAPPING:
@@ -58,9 +59,21 @@ class Agent:
 
             match self.mode:
                 case "custom-parser":
-                    result = await custom_parser(self._mcp_client.session, self.llm, available_tools, task, self.history)
+                    result = await custom_parser(
+                        self._mcp_client.session,
+                        self.llm,
+                        available_tools,
+                        task,
+                        self.history,
+                    )
                 case "native":
-                    result = await native(self._mcp_client.session, self.llm, available_tools, task, self.history)
+                    result = await native(
+                        self._mcp_client.session,
+                        self.llm,
+                        available_tools,
+                        task,
+                        self.history,
+                    )
                     # system_prompt = "Your role is to complete the user's task by using tools that are provided to you. You will make sur e to explain your reasoning before using a particular tool."
                     # user_prompt = task
                     # messages = [
@@ -126,9 +139,9 @@ class Agent:
 
                 case _:
                     raise Exception(f"{self.mode} is not a correct mode.")
-            
+
             self.history.append(result)
-            if result['tool_called_name'] == "final_answer":
+            if result["tool_called_name"] == "final_answer":
                 logger.success(f"Final answer: {result['tool_called_result']}")
                 logger.info(f"Exiting {environment}")
                 await self._mcp_client.cleanup()

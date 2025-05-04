@@ -10,6 +10,7 @@ class ToolCallingResults(TypedDict):
     tool_called_arguments: dict
     tool_called_result: Any
 
+
 def parse_function_call(call_string):
     """
     Parses a string representation of a Python function call.
@@ -39,11 +40,16 @@ def parse_function_call(call_string):
         tree = ast.parse(f"_{call_string.strip()}")
 
         # Check if the parsed tree is a simple expression containing a call
-        if not (isinstance(tree, ast.Module) and
-                len(tree.body) == 1 and
-                isinstance(tree.body[0], ast.Expr) and
-                isinstance(tree.body[0].value, ast.Call)):
-            print("Error: Input string does not seem to be a single function call.", file=sys.stderr)
+        if not (
+            isinstance(tree, ast.Module)
+            and len(tree.body) == 1
+            and isinstance(tree.body[0], ast.Expr)
+            and isinstance(tree.body[0].value, ast.Call)
+        ):
+            print(
+                "Error: Input string does not seem to be a single function call.",
+                file=sys.stderr,
+            )
             return None
 
         call_node = tree.body[0].value
@@ -57,8 +63,11 @@ def parse_function_call(call_string):
         #     # This would require recursively building the name or deciding how to represent it
         #     function_name = ast.unparse(call_node.func) # Reconstructs the name potentially
         else:
-             print(f"Error: Unsupported function call type: {type(call_node.func)}", file=sys.stderr)
-             return None # Or handle other types like attribute access (obj.method) if needed
+            print(
+                f"Error: Unsupported function call type: {type(call_node.func)}",
+                file=sys.stderr,
+            )
+            return None  # Or handle other types like attribute access (obj.method) if needed
 
         # --- Extract Positional Arguments ---
         positional_args = []
@@ -71,25 +80,33 @@ def parse_function_call(call_string):
                 # (e.g., a variable name or complex expression)
                 # You might want to store the raw string representation instead:
                 # positional_args.append(ast.unparse(arg_node))
-                print(f"Warning: Positional argument '{ast.unparse(arg_node)}' is not a literal. Skipping.", file=sys.stderr)
-                return None # Or adjust behavior as needed
+                print(
+                    f"Warning: Positional argument '{ast.unparse(arg_node)}' is not a literal. Skipping.",
+                    file=sys.stderr,
+                )
+                return None  # Or adjust behavior as needed
 
         # --- Extract Keyword Arguments ---
         keyword_args = {}
         for kw_node in call_node.keywords:
             arg_name = kw_node.arg
             if arg_name is None:
-                 print(f"Error: Found '**kwargs' expansion, which is not directly supported for value extraction.", file=sys.stderr)
-                 return None # Cannot evaluate **kwargs without context
+                print(
+                    f"Error: Found '**kwargs' expansion, which is not directly supported for value extraction.",
+                    file=sys.stderr,
+                )
+                return None  # Cannot evaluate **kwargs without context
             try:
                 # ast.literal_eval safely evaluates the value node
                 keyword_args[arg_name] = ast.literal_eval(kw_node.value)
             except ValueError:
-                 # Handle cases where the keyword argument value is not a literal
-                 # keyword_args[arg_name] = ast.unparse(kw_node.value)
-                 print(f"Warning: Keyword argument '{arg_name}={ast.unparse(kw_node.value)}' value is not a literal. Skipping.", file=sys.stderr)
-                 return None # Or adjust behavior as needed
-
+                # Handle cases where the keyword argument value is not a literal
+                # keyword_args[arg_name] = ast.unparse(kw_node.value)
+                print(
+                    f"Warning: Keyword argument '{arg_name}={ast.unparse(kw_node.value)}' value is not a literal. Skipping.",
+                    file=sys.stderr,
+                )
+                return None  # Or adjust behavior as needed
 
         return {
             "function_name": function_name,

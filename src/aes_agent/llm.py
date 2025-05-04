@@ -7,6 +7,7 @@ from typing import Any, Optional
 
 LLMResponse = Any
 
+
 class LLM(ABC):
     def __init__(self, model: str):
         self._client: Any = None
@@ -19,9 +20,11 @@ class LLM(ABC):
     def query(self, system_prompt: str, user_prompt: str) -> str:
         pass
 
+
 class OpenAILLM(ABC):
     def __init__(self, model: str):
         from openai import OpenAI
+
         self._client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
         self.model = model
 
@@ -33,12 +36,16 @@ class OpenAILLM(ABC):
         response = self._client.responses.create(
             model=self.model, input=messages, tools=available_tools
         )
-        logger.info(f"Received the following from {self.__class__.__name__}: {response.output_text}")
+        logger.info(
+            f"Received the following from {self.__class__.__name__}: {response.output_text}"
+        )
         return response
+
 
 class AnthropicLLM(ABC):
     def __init__(self, model: str):
         from anthropic import Anthropic
+
         self._client = Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
         self.model = model
 
@@ -49,7 +56,9 @@ class AnthropicLLM(ABC):
                 logger.info(f"Content type is text: {content.text}")
                 received_texts.append(content.text)
             elif content.type == "tool_use":
-                logger.info(f"Content type is tool_use: {content.name} / {content.input}")
+                logger.info(
+                    f"Content type is tool_use: {content.name} / {content.input}"
+                )
                 tool_name = content.name
                 tool_args = content.input
             else:
@@ -65,6 +74,10 @@ class AnthropicLLM(ABC):
             else:
                 new_messages_list.append(message)
         response = self._client.messages.create(
-            model=self.model, messages=new_messages_list, tools=available_tools, max_tokens=2048, system=system_prompt
+            model=self.model,
+            messages=new_messages_list,
+            tools=available_tools,
+            max_tokens=2048,
+            system=system_prompt,
         )
         return response
