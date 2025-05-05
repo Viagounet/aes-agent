@@ -1,0 +1,12 @@
+agent:
+  llm:
+    type: openai
+    model: gpt-4.1-nano
+  output_mode: native
+environment:
+  type: BrowsingEnvironment
+  args:
+    max_turns: 5
+    available_files:
+    - example_resources/2408.03314v1.pdf
+    - example_resources/2023.inlg-genchal.17.pdf

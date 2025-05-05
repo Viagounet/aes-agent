@@ -13,8 +13,39 @@ async def native(
         {"role": "user", "content": user_prompt},
     ]
 
+    input_messages = [
+        {"role": "user", "content": "What's the weather like in Paris today?"}
+    ]
+
     if isinstance(llm, OpenAILLM):
-        pass  # To implement
+        tools_openai_format = []
+        for tool in available_tools:
+            tool_openai_format = {
+                "type": "function",
+                "name": tool["name"],
+                "description": tool["description"],
+                "additionalProperties": False,
+            }
+            properties_openai_format = {}
+            for argument_name, argument_properties in tool["input_schema"][
+                "properties"
+            ].items():
+                properties_openai_format[argument_name] = {
+                    "type": argument_properties["type"]
+                    if "type" in argument_properties
+                    else "string"
+                }
+
+            tool_openai_format["parameters"] = {
+                "type": "object",
+                "properties": properties_openai_format,
+                "required": list(properties_openai_format.keys()),
+                "required": tool["input_schema"]["required"],
+            }
+            tools_openai_format.append(tool_openai_format)
+
+        response = llm.query(messages, available_tools=tools_openai_format)
+
     elif isinstance(llm, AnthropicLLM):
         for tool_result in history:
             if "metadata" not in tool_result:
