@@ -61,6 +61,7 @@ class Agent:
                 case "custom-parser":
                     result = await custom_parser(
                         self._mcp_client.session,
+                        environment,
                         self.llm,
                         available_tools,
                         task,
@@ -69,6 +70,7 @@ class Agent:
                 case "native":
                     result = await native(
                         self._mcp_client.session,
+                        environment,
                         self.llm,
                         available_tools,
                         task,

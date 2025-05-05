@@ -25,12 +25,12 @@ def format_args(args: list[dict]):
 
 
 async def custom_parser(
-    session, llm, available_tools, task, history: list[ToolCallingResults]
+    session, environment, llm, available_tools, task, history: list[ToolCallingResults]
 ) -> ToolCallingResults:
     tools_strings: list[str] = []
     for tool in available_tools:
         tools_strings.append(tool_to_docllm_format(tool))
-    system_prompt = f"<tools>{'\n'.join(tools_strings)}</tools>\n<answer template>\nReasoning: {{your_reasoning (string)}}\nAction: func(arg1=value1, ...)</answer template>\nUsing the tools at your disposal, complete the user's request by answering following exactly the template."
+    system_prompt = f"{environment.state}<tools>{'\n'.join(tools_strings)}</tools>\n<answer template>\nReasoning: {{your_reasoning (string)}}\nAction: func(arg1=value1, ...)</answer template>\nUsing the tools at your disposal, complete the user's request by answering following exactly the template."
     user_prompt = task
 
     messages = [

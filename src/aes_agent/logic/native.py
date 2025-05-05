@@ -4,9 +4,9 @@ from loguru import logger
 
 
 async def native(
-    session, llm, available_tools, task, history: list[ToolCallingResults]
+    session, environment, llm, available_tools, task, history: list[ToolCallingResults]
 ) -> ToolCallingResults:
-    system_prompt = "Your role is to complete the user's task by using tools that are provided to you. You will make sure to explain your reasoning before using a particular tool."
+    system_prompt = f"{environment.state}\nYour role is to complete the user's task by using tools that are provided to you. You will make sure to explain your reasoning before using a particular tool."
     user_prompt = task
     messages = [
         {"role": "system", "content": system_prompt},

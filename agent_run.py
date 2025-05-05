@@ -46,4 +46,4 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
 
 
 env, agent = load_from_cgf(args.config)
-agent.run(env, "Which one of example_resources/2023.inlg-genchal.17.pdf or example_resources/2408.03314v1.pdf is the longest document?")
+agent.run(env, "Which document is the longest?")
