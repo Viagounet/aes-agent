@@ -55,7 +55,7 @@ async def custom_parser(
             "tool_called_name": "Tool error",
             "tool_called_arguments": {},
             "tool_called_result": None,
-            "metadata": None
+            "metadata": None,
         }
 
     function_name = ""
@@ -82,6 +82,6 @@ async def custom_parser(
         "tool_called_name": function_name,
         "tool_called_arguments": arguments,
         "tool_called_result": toolcall_result.content[0].text,
-        "metadata": None
+        "metadata": None,
     }
     return result

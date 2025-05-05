@@ -23,7 +23,10 @@ async def native(
                 messages.append(
                     {
                         "role": "assistant",
-                        "content": [tool_result["metadata"]["assistant_content"], tool_result["metadata"]["tool_content"]],
+                        "content": [
+                            tool_result["metadata"]["assistant_content"],
+                            tool_result["metadata"]["tool_content"],
+                        ],
                     }
                 )
                 messages.append(
@@ -33,7 +36,7 @@ async def native(
                             {
                                 "type": "tool_result",
                                 "tool_use_id": tool_result["metadata"]["tool_use_id"],
-                                "content": tool_result['tool_called_result'],
+                                "content": tool_result["tool_called_result"],
                             }
                         ],
                     }
@@ -53,13 +56,19 @@ async def native(
                 tool_args = content.input
                 tool_content = content
                 toolcall_result = await session.call_tool(tool_name, tool_args)
-                logger.info(f"Called tool {tool_name} with the following arguments: {tool_args} --> result is {toolcall_result}")
+                logger.info(
+                    f"Called tool {tool_name} with the following arguments: {tool_args} --> result is {toolcall_result}"
+                )
                 return {
                     "reasoning": assistant_content.text,
                     "tool_called_name": tool_name,
                     "tool_called_arguments": tool_args,
                     "tool_called_result": toolcall_result.content[0].text,
-                    "metadata": {"tool_use_id": content.id, "assistant_content": assistant_content, "tool_content": tool_content},
+                    "metadata": {
+                        "tool_use_id": content.id,
+                        "assistant_content": assistant_content,
+                        "tool_content": tool_content,
+                    },
                 }
     else:
         raise Exception(f"No 'native' tool calling for LLM of type {llm}")
