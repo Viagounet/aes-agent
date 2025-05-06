@@ -1,3 +1,5 @@
+import json
+
 from aes_agent.utils import ToolCallingResults, parse_function_call
 from aes_agent.llm import AnthropicLLM, OpenAILLM
 from loguru import logger
@@ -11,10 +13,6 @@ async def native(
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": user_prompt},
-    ]
-
-    input_messages = [
-        {"role": "user", "content": "What's the weather like in Paris today?"}
     ]
 
     if isinstance(llm, OpenAILLM):
@@ -45,6 +43,17 @@ async def native(
             tools_openai_format.append(tool_openai_format)
 
         response = llm.query(messages, available_tools=tools_openai_format)
+        tool_call = response.output[0]
+        tool_name = tool_call.name
+        tool_args = json.loads(tool_call.arguments)
+        toolcall_result = await session.call_tool(tool_name, tool_args)
+        return {
+                    "reasoning": "<no reasoning with OpenAI's native tool calling>",
+                    "tool_called_name": tool_name,
+                    "tool_called_arguments": tool_args,
+                    "tool_called_result": toolcall_result.content[0].text,
+                    "metadata": {}
+                }
 
     elif isinstance(llm, AnthropicLLM):
         for tool_result in history:
