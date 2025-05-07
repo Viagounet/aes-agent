@@ -15,6 +15,7 @@ from aes_agent.agent import Agent
 
 parser = ArgumentParser()
 parser.add_argument("--config", type=str, required=True)
+parser.add_argument("--task", type=str, required=True)
 args = parser.parse_args()
 
 log_filename = "logs/my_app_log_{time:YYYY-MM-DD-hh-mm-ss}.log"
@@ -52,4 +53,4 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
 
 
 env, agent = load_from_cgf(args.config)
-agent.run(env, "Quelle est la différence entre le RLVR et le RLHF?")
+agent.run(env, args.task)

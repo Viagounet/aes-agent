@@ -7,3 +7,4 @@ environment:
   type: OnlineSearchEnvironment
   args:
     max_turns: 15
+    include_current_date: True

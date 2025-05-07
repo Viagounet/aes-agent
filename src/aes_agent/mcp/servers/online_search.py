@@ -10,7 +10,6 @@ from typing import TypedDict, Optional, Any
 from playwright.async_api import async_playwright, Playwright
 from inscriptis import get_text
 
-
 class SearchResult(TypedDict):
     title: str
     url: str

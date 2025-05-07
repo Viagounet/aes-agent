@@ -1,5 +1,5 @@
 import importlib.resources
-
+from datetime import datetime
 
 class Environment:
     def __init__(self):
@@ -63,6 +63,10 @@ class OnlineSearchEnvironment(Environment):
         if "max_turns" in kwargs:
             self.max_turns = kwargs["max_turns"]
 
+        self.include_current_date = True
+        if "include_current_date" in kwargs:
+            self.include_current_date = kwargs["include_current_date"]
+
         self.available_files = []
         if "available_files" in kwargs:
             self.available_files = kwargs["available_files"]
@@ -74,6 +78,13 @@ class OnlineSearchEnvironment(Environment):
 
     @property
     def state(self) -> str:
+        state_string = ""
+        if self.include_current_date:
+            now = datetime.now()
+            current_date_str = now.strftime("%Y-%m-%d %H:%M")
+            state_string += f"Current user date: {current_date_str}"
+        if state_string:
+            return f"<Environment>{state_string}</Environment>"
         return ""
 
     @property
