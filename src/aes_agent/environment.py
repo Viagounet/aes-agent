@@ -1,9 +1,12 @@
 import importlib.resources
 
+
 class Environment:
     def __init__(self):
         self.turn = 0
-        self._mcp_server_script = str(importlib.resources.files("aes_agent").joinpath("mcp/servers/default.py"))
+        self._mcp_server_script = str(
+            importlib.resources.files("aes_agent").joinpath("mcp/servers/default.py")
+        )
 
     @property
     def is_running(self) -> bool:
@@ -19,7 +22,8 @@ class Environment:
     def __repr__(self):
         return self.__class__.__name__
 
-class BrowsingEnvironment(Environment):
+
+class OfflineSearchEnvironment(Environment):
     def __init__(self, **kwargs):
         super().__init__()
         self.max_turns = 5
@@ -29,8 +33,12 @@ class BrowsingEnvironment(Environment):
         self.available_files = []
         if "available_files" in kwargs:
             self.available_files = kwargs["available_files"]
-        self._mcp_server_script = str(importlib.resources.files("aes_agent").joinpath("mcp/servers/local_search.py"))
-    
+        self._mcp_server_script = str(
+            importlib.resources.files("aes_agent").joinpath(
+                "mcp/servers/local_search.py"
+            )
+        )
+
     @property
     def state(self) -> str:
         if not self.available_files:
@@ -40,6 +48,33 @@ class BrowsingEnvironment(Environment):
             state_string += f"\t\t{available_file}"
         state_string += "\n\t</Available files>\n</Environment>"
         return state_string
+
+    @property
+    def is_running(self) -> bool:
+        if self.turn >= self.max_turns:
+            return False
+        return True
+
+
+class OnlineSearchEnvironment(Environment):
+    def __init__(self, **kwargs):
+        super().__init__()
+        self.max_turns = 5
+        if "max_turns" in kwargs:
+            self.max_turns = kwargs["max_turns"]
+
+        self.available_files = []
+        if "available_files" in kwargs:
+            self.available_files = kwargs["available_files"]
+        self._mcp_server_script = str(
+            importlib.resources.files("aes_agent").joinpath(
+                "mcp/servers/online_search.py"
+            )
+        )
+
+    @property
+    def state(self) -> str:
+        return ""
 
     @property
     def is_running(self) -> bool:

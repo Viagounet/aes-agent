@@ -5,7 +5,11 @@ from argparse import ArgumentParser
 from loguru import logger
 from datetime import datetime
 
-from aes_agent.environment import BrowsingEnvironment, Environment
+from aes_agent.environment import (
+    OfflineSearchEnvironment,
+    OnlineSearchEnvironment,
+    Environment,
+)
 from aes_agent.llm import LLM, AnthropicLLM, OpenAILLM
 from aes_agent.agent import Agent
 
@@ -35,8 +39,10 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
             raise Exception(f"{config['agent']['llm']['type']} is not a supported LLM.")
 
     match config["environment"]["type"]:
-        case "BrowsingEnvironment":
-            env = BrowsingEnvironment(**config["environment"]["args"])
+        case "OfflineSearchEnvironment":
+            env = OfflineSearchEnvironment(**config["environment"]["args"])
+        case "OnlineSearchEnvironment":
+            env = OnlineSearchEnvironment(**config["environment"]["args"])
         case _:
             raise Exception(
                 f"{config['environment']['type']} is not a supported environment."
@@ -46,4 +52,4 @@ def load_from_cgf(path: str) -> tuple[Environment, Agent]:
 
 
 env, agent = load_from_cgf(args.config)
-agent.run(env, "Which document is the longest?")
+agent.run(env, "Quelle est la différence entre le RLVR et le RLHF?")

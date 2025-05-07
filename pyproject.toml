@@ -10,9 +10,11 @@ requires-python = ">=3.12"
 dependencies = [
     "anthropic>=0.50.0",
     "fastmcp>=2.2.7",
+    "inscriptis>=2.6.0",
     "loguru>=0.7.3",
     "mcp[cli]>=1.6.0",
     "openai>=1.76.0",
+    "playwright>=1.52.0",
     "pymupdf>=1.25.5",
     "pyyaml>=6.0.2",
 ]

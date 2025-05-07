@@ -1,7 +1,8 @@
 import asyncio
+import os
+
 from typing import Optional
 from contextlib import AsyncExitStack
-
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -21,7 +22,7 @@ class MCPClient:
         server_params = StdioServerParameters(
             command="python",
             args=[server_script_path],
-            env=None
+            env=os.environ
         )
 
         stdio_transport = await self.exit_stack.enter_async_context(stdio_client(server_params))

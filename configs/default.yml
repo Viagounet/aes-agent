@@ -9,6 +9,6 @@ agent:
       include_reasoning: false
 
 environment:
-  type: BrowsingEnvironment
+  type: OfflineSearchEnvironment
   args:
     max_turns: 5

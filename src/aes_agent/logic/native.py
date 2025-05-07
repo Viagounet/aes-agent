@@ -89,18 +89,22 @@ async def native(
                 reasoning = content.text
                 assistant_content = content
             if content.type == "tool_use":
-                logger.info(
-                    f"Content type is tool_use: {content.name} / {content.input}"
-                )
                 tool_name = content.name
                 tool_args = content.input
                 tool_content = content
+                logger.info(f"Calling tool {tool_name} with the following arguments: {tool_args}")
                 toolcall_result = await session.call_tool(tool_name, tool_args)
-                logger.info(
-                    f"Called tool {tool_name} with the following arguments: {tool_args} --> result is {toolcall_result}"
-                )
+                if toolcall_result.isError:
+                    logger.error(
+                        f"Error: {toolcall_result.content[0].text}"
+                    )
+                else:
+                    logger.success(
+                        f"Result: {toolcall_result.content[0].text}"
+                    )
+
                 return {
-                    "reasoning": assistant_content.text,
+                    "reasoning": reasoning,
                     "tool_called_name": tool_name,
                     "tool_called_arguments": tool_args,
                     "tool_called_result": toolcall_result.content[0].text,

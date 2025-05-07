@@ -4,7 +4,7 @@ agent:
     model: gpt-4.1-nano
   output_mode: native
 environment:
-  type: BrowsingEnvironment
+  type: OfflineSearchEnvironment
   args:
     max_turns: 5
     available_files:
