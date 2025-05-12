@@ -6,7 +6,7 @@ agent:
 environment:
   type: OfflineSearchEnvironment
   args:
-    max_turns: 5
+    max_turns: 10
     available_files:
     - example_resources/2408.03314v1.pdf
     - example_resources/2023.inlg-genchal.17.pdf

@@ -14,7 +14,12 @@ class Turn(TypedDict):
     reasoning: str
     tools_called: list[ToolCallingResults]
 
-
+def format_args(args: dict):
+    arguments_list_formated = []
+    for argument_name, value in args.items():
+        arguments_list_formated.append(f"{argument_name}={value}")
+    return ", ".join(arguments_list_formated)
+    
 def parse_function_call(call_string):
     """
     Parses a string representation of a Python function call.

@@ -1,4 +1,4 @@
-from aes_agent.utils import ToolCallingResults, parse_function_call, Turn
+from aes_agent.utils import ToolCallingResults, parse_function_call, Turn, format_args
 from loguru import logger
 
 
@@ -15,13 +15,6 @@ def tool_to_docllm_format(tool: dict) -> str:
                 arg_type = TYPES_MAPPING[arg_properties["type"]]
         args_strings.append(f"{arg_name}: {arg_type}")
     return f"{tool['name']}({', '.join(args_strings)}) => {tool['description']}"
-
-
-def format_args(args: dict):
-    arguments_list_formated = []
-    for argument_name, value in args.items():
-        arguments_list_formated.append(f"{argument_name}={value}")
-    return ", ".join(arguments_list_formated)
 
 
 async def custom_parser(

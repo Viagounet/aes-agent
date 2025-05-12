@@ -1,6 +1,6 @@
 import json
 
-from aes_agent.utils import ToolCallingResults, Turn, parse_function_call
+from aes_agent.utils import ToolCallingResults, Turn, parse_function_call, format_args
 from aes_agent.llm import AnthropicLLM, OpenAILLM
 from loguru import logger
 
@@ -16,7 +16,15 @@ async def native(
     ]
 
     if isinstance(llm, OpenAILLM):
+        if history:
+            for i, turn in enumerate(history):
+                # Add argument: with or without reasoning
+                for tool_call in turn["tools_called"]:
+                    tool_result_string = f"<Tool execution (turn {i + 1})>{tool_call['name']}({format_args(tool_call['arguments'])}) = {tool_call['result']}</Tool execution (turn {i + 1})>"
+                    messages.append({"role": "assistant", "content": tool_result_string})
+
         tools_openai_format = []
+        
         for tool in available_tools:
             tool_openai_format = {
                 "type": "function",
@@ -43,21 +51,23 @@ async def native(
             tools_openai_format.append(tool_openai_format)
 
         response = llm.query(messages, available_tools=tools_openai_format)
-        print(response)
+        tools_called: list[ToolCallingResults] = []
+        reasoning = "<no reasoning>"
         for output in response.output:
             if output.type == "message":
                 reasoning = output.content
-        tool_call = response.output[0]
-        print(tool_call)
-        tool_name = tool_call.name
-        tool_args = json.loads(tool_call.arguments)
-        toolcall_result = await session.call_tool(tool_name, tool_args)
+            elif output.type == "function_call":
+                arguments = json.loads(output.arguments)
+                logger.info(
+                    f"Calling tool {output.name} with the following arguments: {arguments}"
+                )
+                toolcall_result = await session.call_tool(output.name, arguments)
+                logger.info(f"Result: {toolcall_result}")
+                tools_called.append({"name": output.name, "arguments": arguments, "result": toolcall_result.content[0].text, "id": output.id, "metadata": {}})
+
         return {
-            "reasoning": "<no reasoning with OpenAI's native tool calling>",
-            "tools_called_name": [tool_name],
-            "tools_called_arguments": [tool_args],
-            "tools_called_result": [toolcall_result.content[0].text],
-            "metadata": {},
+            "reasoning": reasoning,
+            "tools_called": tools_called
         }
 
     elif isinstance(llm, AnthropicLLM):
