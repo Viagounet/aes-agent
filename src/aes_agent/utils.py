@@ -3,13 +3,16 @@ import sys
 
 from typing import TypedDict, Any, Optional
 
-
 class ToolCallingResults(TypedDict):
+    name: str
+    arguments: dict
+    result: Any
+    id: Optional[str]
+    metadata: Optional[Any]
+
+class Turn(TypedDict):
     reasoning: str
-    tool_called_name: str
-    tool_called_arguments: dict
-    tool_called_result: Any
-    metadata: Optional[dict]
+    tools_called: list[ToolCallingResults]
 
 
 def parse_function_call(call_string):

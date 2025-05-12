@@ -16,12 +16,12 @@ async def number_of_words(pdf_path: str, ctx: Context) -> str:
     data = await ctx.read_resource(f"pdf://{pdf_path}")
     return f"{pdf_path} contains {data[0].content.count(' ')} words"
 
-@mcp.tool()
-async def read_full_pdf(pdf_path: str, ctx: Context) -> str:
-    """Returns to the user the full content of a PDF file."""
-    await ctx.info(f"Processing {pdf_path}...")
-    data = await ctx.read_resource(f"pdf://{pdf_path}")
-    return data[0].content
+# @mcp.tool()
+# async def read_full_pdf(pdf_path: str, ctx: Context) -> str:
+#     """Returns to the user the full content of a PDF file."""
+#     await ctx.info(f"Processing {pdf_path}...")
+#     data = await ctx.read_resource(f"pdf://{pdf_path}")
+#     return data[0].content
 
 @mcp.tool()
 async def read_specific_page(pdf_path: str, pdf_page:int, ctx: Context) -> str:

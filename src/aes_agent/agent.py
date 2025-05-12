@@ -30,7 +30,7 @@ class Agent:
         self.llm = llm
         self._mcp_client = MCPClient()
         self.mode = mode
-        self.history: list[ToolCallingResults] = []
+        self.history: list[Turn] = []
 
     @property
     def _tool_formating_function(self):
@@ -80,11 +80,12 @@ class Agent:
                     raise Exception(f"{self.mode} is not a correct mode.")
 
             self.history.append(result)
-            if result["tool_called_name"] == "final_answer":
-                logger.success(f"Final answer: {result['tool_called_result']}")
-                logger.info(f"Exiting {environment}")
-                await self._mcp_client.cleanup()
-                return self.history
+            for tool_call in result["tools_called"]:
+                if tool_call["name"] == "final_answer":
+                    logger.success(f"Final answer: {tool_call['result']}")
+                    logger.info(f"Exiting {environment}")
+                    await self._mcp_client.cleanup()
+                    return self.history
 
         logger.info(f"Exiting {environment}")
         await self._mcp_client.cleanup()
