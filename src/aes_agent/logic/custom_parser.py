@@ -1,4 +1,4 @@
-from aes_agent.utils import ToolCallingResults, parse_function_call
+from aes_agent.utils import ToolCallingResults, parse_function_call, Turn
 from loguru import logger
 
 
@@ -17,7 +17,7 @@ def tool_to_docllm_format(tool: dict) -> str:
     return f"{tool['name']}({', '.join(args_strings)}) => {tool['description']}"
 
 
-def format_args(args: list[dict]):
+def format_args(args: dict):
     arguments_list_formated = []
     for argument_name, value in args.items():
         arguments_list_formated.append(f"{argument_name}={value}")
@@ -25,8 +25,8 @@ def format_args(args: list[dict]):
 
 
 async def custom_parser(
-    session, environment, llm, available_tools, task, history: list[ToolCallingResults]
-) -> ToolCallingResults:
+    session, environment, llm, available_tools, task, history: list[Turn]
+) -> Turn:
     tools_strings: list[str] = []
     for tool in available_tools:
         tools_strings.append(tool_to_docllm_format(tool))
@@ -39,10 +39,11 @@ async def custom_parser(
     ]
 
     if history:
-        for i, tool_result in enumerate(history):
+        for i, turn in enumerate(history):
             # Add argument: with or without reasoning
-            tool_result_string = f"<Tool execution (turn {i + 1})>{tool_result['tool_called_name']}({format_args(tool_result['tool_called_arguments'])}) = {tool_result['tool_called_result']}</Tool execution (turn {i + 1})>"
-            messages.append({"role": "assistant", "content": tool_result_string})
+            for tool_call in turn["tools_called"]:
+                tool_result_string = f"<Tool execution (turn {i + 1})>{tool_call['name']}({format_args(tool_call['arguments'])}) = {tool_call['result']}</Tool execution (turn {i + 1})>"
+                messages.append({"role": "assistant", "content": tool_result_string})
 
     answer = llm.get_text(llm.query(messages))
     reasoning = answer.split("Action:")[0].replace("Reasoning: ", "").strip()
@@ -51,11 +52,8 @@ async def custom_parser(
     if not parsed_function:
         logger.debug(f"Couldn't parse action: {action}")
         return {
-            "reasoning": "Tool error",
-            "tool_called_name": "Tool error",
-            "tool_called_arguments": {},
-            "tool_called_result": None,
-            "metadata": None,
+            "reasoning": "<Tool error>",
+            "tools_called": [],
         }
 
     function_name = ""
@@ -77,11 +75,8 @@ async def custom_parser(
     )
     toolcall_result = await session.call_tool(function_name, arguments)
     logger.info(f"Results of '{function_name}': {toolcall_result.content[0].text}")
-    result: ToolCallingResults = {
+    result: Turn = {
         "reasoning": reasoning,
-        "tool_called_name": function_name,
-        "tool_called_arguments": arguments,
-        "tool_called_result": toolcall_result.content[0].text,
-        "metadata": None,
+        "tools_called": [{"name": function_name, "arguments": arguments, "result": toolcall_result.content[0].text, "id": None, "metadata": {}}]
     }
     return result
