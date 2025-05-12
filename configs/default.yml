@@ -2,13 +2,11 @@ agent:
   llm:
     type: anthropic
     model: claude-3-5-sonnet-20241022
-  output_mode: custom-parser
-  output_mode_kwargs:
-    history:
-      include_turn_number: true
-      include_reasoning: false
-
+  output_mode: native
 environment:
   type: OfflineSearchEnvironment
   args:
     max_turns: 5
+    available_files:
+    - example_resources/2408.03314v1.pdf
+    - example_resources/2023.inlg-genchal.17.pdf

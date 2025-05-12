@@ -1,7 +1,7 @@
 agent:
   llm:
     type: openai
-    model: gpt-4.1-nano
+    model: gpt-4.1-mini
   output_mode: native
 environment:
   type: OfflineSearchEnvironment
