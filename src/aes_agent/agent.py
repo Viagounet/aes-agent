@@ -5,7 +5,7 @@ from aes_agent.environment import Environment
 from aes_agent.mcp.client import MCPClient
 from aes_agent.logic.custom_parser import custom_parser
 from aes_agent.logic.native import native
-from aes_agent.utils import ToolCallingResults
+from aes_agent.utils import ToolCallingResults, Turn
 
 from loguru import logger
 
